@@ -3,89 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="../static/css/style.css">
+    <title>Text to Voice Studio | Flask TTS App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <header class="header">
-        <h1>Text To Voice Studio</h1>
-        <p>Choose language & Style ↔️ Adjust Speed ↔️ Listen & Download audio</p>
-    </header>
-    <main>
-              <!-- Language Dropdown -->
-            <section class="row">
-                <section class="select-group">
-                    <label>🌍 Language</label>
-                    <select id="languageSelect" title="Languages">
-                        <option value="default">🌐 Browser Default</option>
-                        <option value="en-US">🇺🇸 English (US)</option>
-                        <option value="en-GB">🇬🇧 English (UK)</option>
-                        <option value="es-ES">🇪🇸 Spanish</option>
-                        <option value="fr-FR">🇫🇷 French</option>
-                        <option value="de-DE">🇩🇪 German</option>
-                        <option value="it-IT">🇮🇹 Italian</option>
-                        <option value="pt-BR">🇧🇷 Portuguese</option>
-                        <option value="ja-JP">🇯🇵 Japanese</option>
-                        <option value="ko-KR">🇰🇷 Korean</option>
-                        <option value="zh-CN">🇨🇳 Chinese</option>
-                        <option value="hi-IN">🇮🇳 Hindi</option>
-                        <option value="ru-RU">🇷🇺 Russian</option>
-                        <option value="ar-SA">🇸🇦 Arabic</option>
-                    </select>
+    <div class="app-wrapper">
+        <header class="main-header">
+            <h1>
+                <span>🎙️</span> Text To Voice Studio
+            </h1>
+            <p>Choose language & Style ↔️ Adjust Speed ↔️ Listen & Download audio</p>
+        </header>
+
+        <main class="main-content">
+            <div class="container">
+                <!-- Text Input -->
+                <section class="input-group">
+                    <label>📝 Enter your text</label>
+                    <textarea id="textInput" rows="4" placeholder="Type something here... e.g., Hello, welcome to my text to voice app!"></textarea>
                 </section>
 
-                <!-- Voice Style Dropdown -->
-                <section class="select-group">
-                    <label>🎭 Voice Style</label>
-                    <select id="voiceStyleSelect" title="Voice Style">
-                        <option value="default">✨ Default</option>
-                        <option value="female">👩 Female Voice</option>
-                        <option value="male">👨 Male Voice</option>
-                        <option value="expressive">🎤 Expressive</option>
-                        <option value="calm">🍃 Calm & Soft</option>
-                    </select>
+                <!-- Language and Style  -->
+                <section class="row">
+                    <div class="select-group">
+                        <label>🌍 Language</label>
+                        <select id="languageSelect" title="languages">
+                            <option value="default">🌐 Browser Default</option>
+                            <option value="en-US">🇺🇸 English (US)</option>
+                            <option value="en-GB">🇬🇧 English (UK)</option>
+                            <option value="es-ES">🇪🇸 Spanish</option>
+                            <option value="fr-FR">🇫🇷 French</option>
+                            <option value="de-DE">🇩🇪 German</option>
+                            <option value="it-IT">🇮🇹 Italian</option>
+                            <option value="pt-BR">🇧🇷 Portuguese</option>
+                            <option value="ja-JP">🇯🇵 Japanese</option>
+                            <option value="ko-KR">🇰🇷 Korean</option>
+                            <option value="zh-CN">🇨🇳 Chinese</option>
+                            <option value="hi-IN">🇮🇳 Hindi</option>
+                            <option value="ru-RU">🇷🇺 Russian</option>
+                            <option value="ar-SA">🇸🇦 Arabic</option>
+                        </select>
+                    </div>
+
+                    <div class="select-group">
+                        <label>🎭 Voice Style</label>
+                        <select id="voiceStyleSelect" title="style">
+                            <option value="default">✨ Default</option>
+                            <option value="female">👩 Female Voice</option>
+                            <option value="male">👨 Male Voice</option>
+                            <option value="expressive">🎤 Expressive</option>
+                            <option value="calm">🍃 Calm & Soft</option>
+                        </select>
+                    </div>
                 </section>
-            </section>
 
-            <!-- Pitch & Rate Sliders -->
-            <section class="slider-group">
-                <div class="slider-label">
-                    <span>🎚️ Pitch</span>
-                    <span id="pitchValue">1.0</span>
+                <!-- Pitch Control -->
+                <section class="slider-group">
+                    <div class="slider-label">
+                        <span>🎚️ Pitch</span>
+                        <span id="pitchValue">1.0</span>
+                    </div>
+                    <input title="pitch" type="range" id="pitchSlider" min="0.5" max="2.0" step="0.05" value="1.0">
+                </section>
+
+                <!-- Speed/Rate Control -->
+                <section class="slider-group">
+                    <div class="slider-label">
+                        <span>⚡ Speed (Rate)</span>
+                        <span id="rateValue">1.0</span>
+                    </div>
+                    <input title="Speed" type="range" id="rateSlider" min="0.5" max="2.0" step="0.05" value="1.0">
+                </section>
+
+                <!-- Action Buttons -->
+                <section class="button-group">
+                    <button type="button" id="speakBtn" class="btn-primary">🔊 Speak</button>
+                    <button type="button" id="stopBtn" class="btn-secondary">⏹️ Stop</button>
+                    <button type="button" id="downloadBtn" class="btn-download">💾 Download Audio</button>
+                </section>
+
+                <!-- Status Message -->
+                <div id="statusMessage" class="status">
+                    ✨ Ready — select language & style, then click Speak
                 </div>
-                <input type="range" id="pitchSlider" min="0.5" max="2.0" step="0.05" value="1.0" title="pitch">
-            </section>
 
-            <div class="slider-group">
-                <div class="slider-label">
-                    <span>⚡ Speed (Rate)</span>
-                    <span id="rateValue">1.0</span>
+                <hr>
+                <div class="note">
+                    💡 Tip: Different languages and styles depend on your browser's available voices.<br>
+                    For advanced TTS features (pitch/rate control), integrate with cloud services like AWS Polly or Azure TTS.
                 </div>
-                <input type="range" id="rateSlider" min="0.5" max="2.0" step="0.05" value="1.0" title="speed">
             </div>
+        </main>
 
-            <!-- Action Buttons -->
-            <div class="button-group">
-                <button id="speakBtn" class="btn-primary">🔊 Speak</button>
-                <button id="stopBtn" class="btn-secondary">⏹️ Stop</button>
-                <button id="downloadBtn" class="btn-download">💾 Download Audio</button>
-            </div>
-
-            <!-- Status Message -->
-            <div id="statusMessage" class="status">
-                ✨ Ready — select language & style, then click Speak
-            </div>
-
-            <hr>
-            <div class="note">
-                💡 Tip: Different languages and styles depend on your browser's available voices.
-            </div>
-        </div>
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2024 Text to Voice Studio | All Rights Reserved</p>
+        </footer>
     </div>
-    </main>
-    <footer>
-        <p>&copy; @AbuBakr All Rights Reserved</p>
-    </footer>
-    <script src="../static/js/script.js"></script>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
