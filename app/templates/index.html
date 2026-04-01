@@ -3,101 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Text to Voice Studio | Flask TTS App</title>
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta name="description" content="Text to Voice Studio — Convert text to speech in multiple languages and styles">
+    <title>Text to Voice Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+    <div class="noise-overlay" aria-hidden="true"></div>
+
     <div class="app-wrapper">
-        <header class="main-header">
-            <h1>
-                <span>🎙️</span> Text To Voice Studio
-            </h1>
-            <p>Choose language & Style ↔️ Adjust Speed ↔️ Listen & Download audio</p>
+        <header class="main-header" role="banner">
+            <div class="header-inner">
+                <div class="logo-mark" aria-hidden="true">
+                    <div class="logo-bar"></div>
+                    <div class="logo-bar"></div>
+                    <div class="logo-bar"></div>
+                    <div class="logo-bar"></div>
+                    <div class="logo-bar"></div>
+                </div>
+                <div>
+                    <h1>Text to Voice Studio</h1>
+                    <p class="tagline">Select language &amp; style · Adjust pitch &amp; speed · Listen or download</p>
+                </div>
+            </div>
         </header>
 
-        <main class="main-content">
+        <main class="main-content" role="main">
             <div class="container">
-                <!-- Text Input -->
-                <section class="input-group">
-                    <label>📝 Enter your text</label>
-                    <textarea id="textInput" rows="4" placeholder="Type something here... e.g., Hello, welcome to my text to voice app!"></textarea>
-                </section>
 
-                <!-- Language and Style  -->
-                <section class="row">
-                    <div class="select-group">
-                        <label>🌍 Language</label>
-                        <select id="languageSelect" title="languages">
-                            <option value="default">🌐 Browser Default</option>
-                            <option value="en-US">🇺🇸 English (US)</option>
-                            <option value="en-GB">🇬🇧 English (UK)</option>
-                            <option value="es-ES">🇪🇸 Spanish</option>
-                            <option value="fr-FR">🇫🇷 French</option>
-                            <option value="de-DE">🇩🇪 German</option>
-                            <option value="it-IT">🇮🇹 Italian</option>
-                            <option value="pt-BR">🇧🇷 Portuguese</option>
-                            <option value="ja-JP">🇯🇵 Japanese</option>
-                            <option value="ko-KR">🇰🇷 Korean</option>
-                            <option value="zh-CN">🇨🇳 Chinese</option>
-                            <option value="hi-IN">🇮🇳 Hindi</option>
-                            <option value="ru-RU">🇷🇺 Russian</option>
-                            <option value="ar-SA">🇸🇦 Arabic</option>
-                        </select>
+              
+                <div class="waveform" id="waveform" aria-hidden="true">
+                    <div class="waveform-idle">
+                        <span>◈</span> Ready to synthesize
                     </div>
-
-                    <div class="select-group">
-                        <label>🎭 Voice Style</label>
-                        <select id="voiceStyleSelect" title="style">
-                            <option value="default">✨ Default</option>
-                            <option value="female">👩 Female Voice</option>
-                            <option value="male">👨 Male Voice</option>
-                            <option value="expressive">🎤 Expressive</option>
-                            <option value="calm">🍃 Calm & Soft</option>
-                        </select>
+                    <div class="waveform-bars" id="waveformBars">
+                        <span></span><span></span><span></span><span></span><span></span>
+                        <span></span><span></span><span></span><span></span><span></span>
+                        <span></span><span></span><span></span><span></span><span></span>
+                        <span></span><span></span><span></span><span></span><span></span>
                     </div>
-                </section>
-
-                <!-- Pitch Control -->
-                <section class="slider-group">
-                    <div class="slider-label">
-                        <span>🎚️ Pitch</span>
-                        <span id="pitchValue">1.0</span>
-                    </div>
-                    <input title="pitch" type="range" id="pitchSlider" min="0.5" max="2.0" step="0.05" value="1.0">
-                </section>
-
-                <!-- Speed/Rate Control -->
-                <section class="slider-group">
-                    <div class="slider-label">
-                        <span>⚡ Speed (Rate)</span>
-                        <span id="rateValue">1.0</span>
-                    </div>
-                    <input title="Speed" type="range" id="rateSlider" min="0.5" max="2.0" step="0.05" value="1.0">
-                </section>
-
-                <!-- Action Buttons -->
-                <section class="button-group">
-                    <button type="button" id="speakBtn" class="btn-primary">🔊 Speak</button>
-                    <button type="button" id="stopBtn" class="btn-secondary">⏹️ Stop</button>
-                    <button type="button" id="downloadBtn" class="btn-download">💾 Download Audio</button>
-                </section>
-
-                <!-- Status Message -->
-                <div id="statusMessage" class="status">
-                    ✨ Ready — select language & style, then click Speak
                 </div>
 
-                <hr>
-                <div class="note">
-                    💡 Tip: Different languages and styles depend on your browser's available voices.<br>
-                    For advanced TTS features (pitch/rate control), integrate with cloud services like AWS Polly or Azure TTS.
+                
+                <section class="input-section">
+                    <div class="label-row">
+                        <label for="textInput">Text to speak</label>
+                        <span class="char-counter" id="charCounter">0 / 500</span>
+                    </div>
+                    <textarea
+                        id="textInput"
+                        rows="4"
+                        maxlength="500"
+                        placeholder="Type or paste your text here… e.g. Hello, welcome to Text to Voice Studio!"
+                        aria-label="Text to convert to speech"
+                        aria-describedby="charCounter"
+                        spellcheck="true"
+                        autocomplete="off"
+                    ></textarea>
+                </section>
+
+               
+                <div class="controls-row">
+                    <div class="select-group">
+                        <label for="languageSelect">Language</label>
+                        <div class="select-wrapper">
+                            <select id="languageSelect" aria-label="Select language" title="Language">
+                                <option value="default">Browser Default</option>
+                                <option value="en-US">English (US)</option>
+                                <option value="en-GB">English (UK)</option>
+                                <option value="es-ES">Spanish</option>
+                                <option value="fr-FR">French</option>
+                                <option value="de-DE">German</option>
+                                <option value="it-IT">Italian</option>
+                                <option value="pt-BR">Portuguese (BR)</option>
+                                <option value="ja-JP">Japanese</option>
+                                <option value="ko-KR">Korean</option>
+                                <option value="zh-CN">Chinese (CN)</option>
+                                <option value="hi-IN">Hindi</option>
+                                <option value="ru-RU">Russian</option>
+                                <option value="ar-SA">Arabic</option>
+                            </select>
+                            <span class="select-arrow" aria-hidden="true">▾</span>
+                        </div>
+                    </div>
+
+                    <div class="select-group">
+                        <label for="voiceStyleSelect">Voice Style <span class="label-hint">(Speak only)</span></label>
+                        <div class="select-wrapper">
+                            <select id="voiceStyleSelect" aria-label="Select voice style" title="Voice style">
+                                <option value="default">Default</option>
+                                <option value="female">Female</option>
+                                <option value="male">Male</option>
+                                <option value="expressive">Expressive</option>
+                                <option value="calm">Calm &amp; Soft</option>
+                            </select>
+                            <span class="select-arrow" aria-hidden="true">▾</span>
+                        </div>
+                    </div>
                 </div>
+
+               
+                <div class="sliders-row">
+                    <div class="slider-group">
+                        <div class="slider-label-row">
+                            <label for="pitchSlider">Pitch</label>
+                            <output id="pitchValue" for="pitchSlider">1.0</output>
+                        </div>
+                        <input
+                            type="range"
+                            id="pitchSlider"
+                            min="0.5"
+                            max="2.0"
+                            step="0.05"
+                            value="1.0"
+                            aria-label="Pitch control"
+                            aria-valuemin="0.5"
+                            aria-valuemax="2.0"
+                            aria-valuenow="1.0"
+                        >
+                        <div class="slider-ticks" aria-hidden="true">
+                            <span>0.5</span><span>1.0</span><span>2.0</span>
+                        </div>
+                    </div>
+
+                    <div class="slider-group">
+                        <div class="slider-label-row">
+                            <label for="rateSlider">Speed</label>
+                            <output id="rateValue" for="rateSlider">1.0</output>
+                        </div>
+                        <input
+                            type="range"
+                            id="rateSlider"
+                            min="0.5"
+                            max="2.0"
+                            step="0.05"
+                            value="1.0"
+                            aria-label="Speed control"
+                            aria-valuemin="0.5"
+                            aria-valuemax="2.0"
+                            aria-valuenow="1.0"
+                        >
+                        <div class="slider-ticks" aria-hidden="true">
+                            <span>0.5×</span><span>1.0×</span><span>2.0×</span>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="button-group" role="group" aria-label="Playback controls">
+                    <button type="button" id="speakBtn" class="btn btn-speak" aria-label="Speak text">
+                        <span class="btn-icon" aria-hidden="true">▶</span>
+                        <span>Speak</span>
+                    </button>
+                    <button type="button" id="stopBtn" class="btn btn-stop" aria-label="Stop speaking">
+                        <span class="btn-icon" aria-hidden="true">■</span>
+                        <span>Stop</span>
+                    </button>
+                    <button type="button" id="downloadBtn" class="btn btn-download" aria-label="Download audio as WAV">
+                        <span class="btn-icon" aria-hidden="true">↓</span>
+                        <span>Download</span>
+                    </button>
+                </div>
+
+                
+                <div
+                    id="statusMessage"
+                    class="status"
+                    role="status"
+                    aria-live="polite"
+                    aria-atomic="true"
+                >
+                    Ready — select options and click Speak
+                </div>
+
+                <!-- Translation preview -->
+                <div id="translationBox" class="translation-box" style="display:none" aria-live="polite">
+                    <span class="translation-label">Translation preview</span>
+                    <p id="translationText"></p>
+                </div>
+
+                <div class="divider" aria-hidden="true"></div>
+
+                <p class="note">
+                    <strong>Speak</strong> uses your browser's voices (pitch, rate &amp; style apply).
+                    <strong>Download</strong> translates your text and generates a real <strong>.mp3</strong> via gTTS.
+                    Use <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to speak quickly.
+                </p>
             </div>
         </main>
 
-        <!-- Footer -->
-        <footer class="footer">
-            <p>&copy; 2024 Text to Voice Studio | All Rights Reserved</p>
+        <footer class="footer" role="contentinfo">
+            <p>&copy; 2025 Text to Voice Studio</p>
         </footer>
     </div>
 
