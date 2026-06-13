@@ -70,3 +70,9 @@ def _configure_logging(app: Flask) -> None:
     app.logger.addHandler(handler)
     app.logger.setLevel(level)
     app.logger.propagate = False
+
+
+# Create the application instance to support deployments like Gunicorn
+# that expect 'app' to be an attribute of the 'app' package/module.
+env = os.environ.get('ENV', 'production').lower()
+app = create_app(config_name=env)

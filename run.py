@@ -1,10 +1,6 @@
 import os
-from app import create_app
+from app import app
 
-
-env = os.environ.get('ENV', 'development').lower()
-
-app = create_app(config_name=env)
 
 if __name__ == '__main__':
     host = os.environ.get('HOST', '127.0.0.1')
@@ -13,4 +9,4 @@ if __name__ == '__main__':
     except ValueError:
         port = 5000
 
-    app.run(host=host, port=port)
+    app.run(host=host, port=port)
